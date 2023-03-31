@@ -2,6 +2,7 @@ package hello.login.web;
 
 import hello.login.domain.member.Member;
 import hello.login.domain.member.MemberRepository;
+import hello.login.web.argumentresolver.Login;
 import hello.login.web.session.SessionManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -76,8 +77,20 @@ public class HomeController {
         return "loginHome";
     }
 
-    @GetMapping("/") //required==false : 로그인 안한 사용자도 들어와야하니까, Long memberId : cookie 값은 string이지만 스프링이 자동으로 타입전환 해줌
+    //@GetMapping("/") //required==false : 로그인 안한 사용자도 들어와야하니까, Long memberId : cookie 값은 string이지만 스프링이 자동으로 타입전환 해줌
     public String homeLoginV3Spring(@SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember, Model model) {
+
+        //세션에 회원 데이터가 없으면 Home
+        if(loginMember==null){  //쿠키가 옜날에 만들어져서 없을 수도 있음
+            return "home";
+        }
+        //세션이 유지되면 로그인으로 이동
+        model.addAttribute("member",loginMember);
+        return "loginHome";
+    }
+
+    @GetMapping("/")
+    public String homeLoginV3ArgumentResolver(@Login Member loginMember, Model model) {
 
         //세션에 회원 데이터가 없으면 Home
         if(loginMember==null){  //쿠키가 옜날에 만들어져서 없을 수도 있음
